@@ -13,7 +13,7 @@ from notifiers import Notifiers
 from tgtg import TgtgClient
 
 VERSION_URL = 'https://api.github.com/repos/Der-Henning/tgtg/releases/latest'
-VERSION = "1.11.4"
+VERSION = "1.11.5"
 
 prog_folder = path.dirname(sys.executable) if getattr(
     sys, '_MEIPASS', False) else path.dirname(path.abspath(__file__))
@@ -106,6 +106,8 @@ class Scanner():
             except Exception:
                 log.error("check item error! - %s", sys.exc_info())
         log.debug("new State: %s", self.amounts)
+        if len(self.amounts) == 0:
+            log.warning("No items in observation! Did you add any favorites?")
         self.config.save_tokens(
             self.tgtg_client.access_token,
             self.tgtg_client.refresh_token,
