@@ -5,14 +5,13 @@ on:
         branches:
             - main
             - dev
-            - scheduled-job-limits
 #         tags:
 #             - v*
     pull_request:
         branches:
             - main
-    schedule:
-        - cron: "0 1 * * *"
+#     schedule:
+#         - cron: "0 1 * * *"
 
 jobs:
     code-ql:
@@ -167,55 +166,55 @@ jobs:
                 repository: ${{ secrets.DOCKER_USERNAME }}/tgtg
                 short-description: ${{ github.event.repository.description }}
                 readme-filepath: ./DOCKER_README.md
-    releases:
-        name: Build Release Files
-        runs-on: ${{ matrix.os }}
-#         needs: tests
-        if: github.event_name == 'push' && (github.ref_name == 'main' || github.ref_type == 'tag')
-        strategy:
-            matrix:
-                include:
-                    -   os: ubuntu-latest
-                        tag: linux
-                    -   os: windows-latest
-                        tag: win
-                    -   os: macos-latest
-                        tag: macos
-        steps:
-        -   uses: actions/checkout@v3
-        -   uses: actions/setup-python@v4
-            with:
-                python-version: 3.9
-        -   name: Install dependencies
-            run: pip install -r requirements.dev.txt
-        -   name: Run PyInstaller
-            run: |
-                pyinstaller scanner.spec
-                cp ./src/config.sample.ini ./dist/config.ini
-        -   name: Make filename
-            id: filename
-            run: echo "::set-output name=filename::scanner-${{ github.ref_name }}-${{ matrix.tag }}.zip"
-        -   name: Zip files
-            if: matrix.tag == 'linux' || matrix.tag == 'macos'
-            run: zip -j ./${{ steps.filename.outputs.filename }} ./dist/*
-        -   name: Zip files
-            if: matrix.tag == 'win'
-            run: Compress-Archive ./dist/* ./${{ steps.filename.outputs.filename }}
-        -   uses: actions/upload-artifact@v3
-            with: 
-                name: releases
-                path: ./${{ steps.filename.outputs.filename }}
-        -   uses: bruceadams/get-release@v1.2.3
-            if: github.ref_type == 'tag'
-            id: get_release
-            env:
-                GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
-        -   uses: actions/upload-release-asset@v1
-            if: github.ref_type == 'tag'
-            env:
-                GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
-            with:
-                upload_url: ${{ steps.get_release.outputs.upload_url }}
-                asset_path: ./${{ steps.filename.outputs.filename }}
-                asset_name: ${{ steps.filename.outputs.filename }}
-                asset_content_type: application/zip
+#     releases:
+#         name: Build Release Files
+#         runs-on: ${{ matrix.os }}
+# #         needs: tests
+#         if: github.event_name == 'push' && (github.ref_name == 'main' || github.ref_type == 'tag')
+#         strategy:
+#             matrix:
+#                 include:
+#                     -   os: ubuntu-latest
+#                         tag: linux
+#                     -   os: windows-latest
+#                         tag: win
+#                     -   os: macos-latest
+#                         tag: macos
+#         steps:
+#         -   uses: actions/checkout@v3
+#         -   uses: actions/setup-python@v4
+#             with:
+#                 python-version: 3.9
+#         -   name: Install dependencies
+#             run: pip install -r requirements.dev.txt
+#         -   name: Run PyInstaller
+#             run: |
+#                 pyinstaller scanner.spec
+#                 cp ./src/config.sample.ini ./dist/config.ini
+#         -   name: Make filename
+#             id: filename
+#             run: echo "::set-output name=filename::scanner-${{ github.ref_name }}-${{ matrix.tag }}.zip"
+#         -   name: Zip files
+#             if: matrix.tag == 'linux' || matrix.tag == 'macos'
+#             run: zip -j ./${{ steps.filename.outputs.filename }} ./dist/*
+#         -   name: Zip files
+#             if: matrix.tag == 'win'
+#             run: Compress-Archive ./dist/* ./${{ steps.filename.outputs.filename }}
+#         -   uses: actions/upload-artifact@v3
+#             with: 
+#                 name: releases
+#                 path: ./${{ steps.filename.outputs.filename }}
+#         -   uses: bruceadams/get-release@v1.2.3
+#             if: github.ref_type == 'tag'
+#             id: get_release
+#             env:
+#                 GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+#         -   uses: actions/upload-release-asset@v1
+#             if: github.ref_type == 'tag'
+#             env:
+#                 GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+#             with:
+#                 upload_url: ${{ steps.get_release.outputs.upload_url }}
+#                 asset_path: ./${{ steps.filename.outputs.filename }}
+#                 asset_name: ${{ steps.filename.outputs.filename }}
+#                 asset_content_type: application/zip
