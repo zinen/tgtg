@@ -6,8 +6,8 @@ on:
             - main
             - dev
             - scheduled-job-limits
-        tags:
-            - v*
+#         tags:
+#             - v*
     pull_request:
         branches:
             - main
